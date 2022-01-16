@@ -83,7 +83,6 @@ for (v in m) {
 result
 
 v<-sample(1:100,5)
-
 length(v)
 length(m)
 nrow(m)
@@ -91,7 +90,19 @@ ncol(m)
 rsum<-apply(m, 1, sum)
 csum<-apply(m, 2, sum)
 
+#점심시간 이전 문제
 # apply  -> cbind ->apply ->rbind
+m <- matrix(1:20, nrow = 4)
+row.sum<-apply(m, 1, sum)
+#cbind를 이용해서 합친다
+m.1<-cbind(m,row.sum)
+col.sum<-apply(m.1, 2, sum)
+m.2<-rbind(m.1,col.sum)
+colnames(m.2)<-c('c1','c2','c3','c4','c5','csum')
+rownames(m.2)<-c('r1','r2','r3','r4','rsum')
+m.2
+
+
 
 arr<-array(1:12,c(3,2,2))
 
@@ -176,6 +187,21 @@ index3<-df['a']>=71
 df['status'][index3]<-'hight'
 
 
-
-
-
+# 타이타닉 데이터 인터넷 다운받기
+# 검색... titanic csv github  -> 첫번째째
+titanic.df<-read.csv("https://gist.githubusercontent.com/jwalsh/ce1dc0436aba5b7a5c9666f47fa5a380/raw/5ce3854392b43ff97907112d344fc008229b0445/titanic.csv")
+#기본과정... 데이터를 가지고 온다음 하는 
+summary(titanic.df)  # NA데이터(결측치치) 및 중위값과 평균을 비교해서 이상치를 가늠한다
+str(titanic.df)
+table(titanic.df['Sex'])
+titanic.df['Age']
+#titanic.df['Age'] 연속형 데이터를 범주형...
+titanic.df['Age_type']<-'child'
+titanic.df['Age_type']
+child_index<-titanic.df["Age"] >=0 & titanic.df["Age"] <=10
+teanAger_index<-titanic.df["Age"] >=11 & titanic.df["Age"] <=19
+adult_index<-titanic.df["Age"] >=20
+titanic.df['Age_type'][teanAger_index]<-"teanAger"
+titanic.df['Age_type'][adult_index]<-"adult"
+titanic.df['Age_type']
+table(titanic.df['Age_type'])
