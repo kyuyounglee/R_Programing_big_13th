@@ -78,8 +78,8 @@ st = read.table('https://raw.githubusercontent.com/kyuyounglee/R_Programing_big_
                 ,header = T)
 str(st)
 
-write.table(st,"d:/st.txt",quote=F)
-write.csv(st,"d:/st.csv",quote=F)
+write.table(st,"d:/st.txt",quote=F,header = TRUE)
+write.csv(st,"d:/st.csv",quote=F,header = TRUE)
 
 
 #   ==  equal
@@ -104,5 +104,22 @@ check
 age = sample(0:100,10)
 check = ifelse( age>20 , "adult","not adult")
 check
+
+
+# 저장한 데이터 불러오기
+students =  read.csv("d:/st.csv",header = T)
+cols = names(students)[-1]
+students = students[cols]
+
+students[4,4] = -100
+students[2,3] = 120
+
+students$korean = ifelse(students$korean>=0 & students$korean<=100, 
+                         students$korean,NA)
+students$english = ifelse(students$english>=0 & students$english<=100, 
+                         students$english,NA)
+students$math = ifelse(students$math>=0 & students$math<=100, 
+                          students$math,NA)
+
 
 
