@@ -114,6 +114,10 @@ students = students[cols]
 students[4,4] = -100
 students[2,3] = 120
 
+names(students)
+
+
+
 students$korean = ifelse(students$korean>=0 & students$korean<=100, 
                          students$korean,NA)
 students$english = ifelse(students$english>=0 & students$english<=100, 
@@ -121,5 +125,101 @@ students$english = ifelse(students$english>=0 & students$english<=100,
 students$math = ifelse(students$math>=0 & students$math<=100, 
                           students$math,NA)
 
+
+# 데이터 가져오기
+students =  read.csv("d:/st.csv",header = T)
+# 불필요한 x컬럼의 데이터 제거하기(x컬럼제외하고 다 가져오기)
+students = students[ names(students)[-1] ]
+# 문제있는 데이터 만들기 (0 ~100 이외의 데이터)
+students[4,4] = -100
+students[2,3] = 120
+students
+
+# 범위를 넘어선 데이터는 NA로 기록한다
+for(idx in 2:4){
+  students[,idx] = ifelse(students[,idx]>=0 & students[,idx]<=100, 
+                             students[,idx],NA)
+}
+
+students
+
+
+#간단한 함수 만들기
+# 두개의 값을 전달하면 결과로 더한 값을 리턴하는
+# 함수이름은 addTwoNumber
+
+
+addTwoNumber = function(n1,n2){
+  return (n1+n2)
+}
+
+# 변수  -> 변수
+# 이름을 그냥쓰면 그것은 변수
+# 이름() -->함수
+
+addTwoNumber(10,20)
+
+
+
+
+job.type <- "A" 
+if(job.type == 'B'){
+  bonus <- 200
+}else{
+  bonus <- 100
+}
+
+
+# for excample
+# data : iris
+
+str(iris)
+head(iris,3)
+View(iris)
+
+# 1.6보다 작거나 같으면 L
+# 기존 DataFrame에 컬럼을 만들어서 L M H 라고 기록한다
+
+for(idx in 1:nrow(iris) ){
+  if(iris$Petal.Length[idx] <= 1.6){
+    iris$label[idx] <- 'L'
+  }else if(iris$Petal.Length[idx] <= 5.1){   # 1.6 <  x   <= 5.1
+    iris$label[idx] <- 'M'
+  }else{
+    iris$label[idx] <- 'H'
+  }
+}
+iris$label
+
+
+for( i in 1:10){
+  if(i == 3){ 
+    next
+  }
+  print(i)
+}
+
+
+
+head(iris,3)
+
+
+iris[1:4]
+apply(iris[1:4],2,mean)
+
+  
+  
+
+students
+students.omit<- na.omit(students)
+is.na(students)
+!is.na(students)
+students
+mean(students$math, na.rm = T)
+sum(students$math)
+sum(students$math, na.rm = T)
+
+airquality
+str(airquality)
 
 
