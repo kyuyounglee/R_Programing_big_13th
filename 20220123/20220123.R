@@ -91,6 +91,7 @@ boxplot(changed)
 
 
 install.packages("gapminder")
+install.packages("dplyr")
 library(gapminder)
 library(dplyr) #  %>% --> 파이프연산자 를 사용가능하게 하는  library 
 str(gapminder)
@@ -106,7 +107,32 @@ gapminder[gapminder$country == 'Korea, Dem. Rep.',]
 temp1 <- gapminder[gapminder$country == 'Korea, Rep.',]
 temp1[temp1$lifeExp > 60,]
 
+asia<-gapminder[gapminder$continent == 'Asia',]
+asia[asia$gdpPercap ==  max(asia$gdpPercap),]
+
+asia[asia$gdpPercap ==  max(asia[asia$year >=2000 ,]['gdpPercap']),]
 
 
+summary(gapminder) # 기본기능 기술통계량
+summarise(gapminder,mean = mean(year),count = n(),sum = sum())
+
+summarise(group_by(gapminder, continent,country), pop_avg = mean(pop))
+summarise(gapminder,pop_avg = mean(pop))
+
+summarise(group_by(gapminder, continent), gdp_avg = mean(gdpPercap) )
+summarise(group_by(gapminder, continent), lifeExp_avg = mean(lifeExp) )
+summarise(group_by(gapminder, continent), gdp_avg = mean(gdpPercap),
+          lifeExp_avg = mean(lifeExp) )
+
+head(gapminder)
+gapminder %>%  head() 
+
+
+
+gapminder %>% group_by(continent) %>% summarise(gdp_avg=mean(gdpPercap))
+summarise(group_by(gapminder, continent), gdp_avg = mean(gdpPercap) )
+
+# a(b(c(data)))
+# data %>% c() %>% b() %>% a()
 
 
