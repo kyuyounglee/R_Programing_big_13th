@@ -56,4 +56,57 @@ patients<-patients[patients$gender == "M" | patients$gender == "F", ]
 patients<-patients[patients$blood.type == "A" | patients$blood.type == "O" |
   patients$blood.type == "B" | patients$blood.type == "AB", ]
 
-  
+
+boxplot(airquality)
+
+
+v1<-c(rep(1:10,10),100,200,300)
+boxplot(v1)
+# IRQ 를 사용한 이상치 제거
+# IRQ = Q3 - Q1
+# Q1 - 1.5*IRQ  <  정상데이터 < Q3 + 1.5*IRQ
+
+ao <- summary( airquality$Ozone)
+irq = ao['3rd Qu.'] - ao['1st Qu.']
+ao['1st Qu.'] - 1.5*irq
+ao['3rd Qu.'] + 1.5*irq
+
+t<-airquality[airquality$Ozone > ao['1st Qu.'] - 1.5*irq & 
+  airquality$Ozone < ao['3rd Qu.'] + 1.5*irq, ]
+
+boxplot(t$Ozone)$stats  
+
+boxplot(airquality$Ozone)$stats
+boxplot(airquality$Ozone[airquality$Ozone > 1 & airquality$Ozone < 75])
+
+
+# 이상치를 제거합시다다
+airWindStats<-boxplot(airquality$Wind)$stats
+low<-airWindStats[1,1]
+high <-airWindStats[5,1] 
+
+changed<-airquality$Wind[airquality$Wind>low & airquality$Wind<high]
+boxplot(changed)
+
+
+
+install.packages("gapminder")
+library(gapminder)
+library(dplyr) #  %>% --> 파이프연산자 를 사용가능하게 하는  library 
+str(gapminder)
+names(gapminder)
+gapminder$country
+gapminder$gdpPercap
+table(gapminder$continent)
+summary(gapminder)
+
+gapminder[gapminder$country == 'Korea, Rep.',]
+gapminder[gapminder$country == 'Korea, Dem. Rep.',]
+
+temp1 <- gapminder[gapminder$country == 'Korea, Rep.',]
+temp1[temp1$lifeExp > 60,]
+
+
+
+
+
