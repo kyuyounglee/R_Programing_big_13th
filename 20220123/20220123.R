@@ -135,4 +135,44 @@ summarise(group_by(gapminder, continent), gdp_avg = mean(gdpPercap) )
 # a(b(c(data)))
 # data %>% c() %>% b() %>% a()
 
+summarize(group_by(gapminder, continent), gdp_avg = mean(gdpPercap) )
+
+
+gapminder$year %>% table()
+gapminder$country
+#Korea, Rep.
+gapminder %>% filter(country == 'Korea, Rep.') %>% 
+  select(year,lifeExp,pop,gdpPercap) %>% 
+  summarise(life_avg = mean(lifeExp), 
+            pop_avg = mean(pop), gdp_avg=mean(gdpPercap))
+
+
+
+filepath <-"https://raw.githubusercontent.com/kyuyounglee/R_Programing_big_13th/main/20220122/avocado.csv"
+avocado <- filepath %>% read.csv(header = T)
+avocado %>% str()
+avocado %>% summary()
+avocado %>% is.na() %>% table()
+
+avocado %>% head()
+
+newCols <-(avocado %>% names())[-1]
+
+avocado<-avocado %>% select(newCols)
+
+avocado %>% head(1)
+
+avocado %>% select(year,region)
+
+x_avg<-avocado %>% group_by(year,region) %>% summarise(v_avg = mean(Total.Volume),
+                                                p_avg =AveragePrice )
+
+x_avg %>% head()
+x_avg %>% arrange(desc(v_avg) )
+
+avocado$region %>% table()
+
+x_avg %>% filter(region != 'TotalUS') %>% arrange(desc(v_avg))
+
+
 
