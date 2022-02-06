@@ -195,11 +195,53 @@ predict(model,data.frame(Sepal.Length=7.0,Sepal.Width=3.0))
 # 1 0 0  001 000 000
 
 
+# 실습: 날씨 관련 요인 변수로 비(rain) 유뮤 예측
+# 단계 1: 데이터 가져오기 
+weather = read.csv("C:/Rwork/Part-IV/weather.csv", stringsAsFactors = F)
+weather<-na.omit(weather)
+#dim(weather)
+#head(weather)
+#str(weather)
+
+# 단계 2: 변수 선택과 더비 벼수 생성
+#weather_df <- weather[ , c(-1, -6, -8, -14)]
+index<-c(1, 6, 8, 14)
+weather_df<-weather[,-index]
+str(weather_df)
+
+weather_df$RainTomorrow[weather_df$RainTomorrow == 'Yes'] <- 1
+weather_df$RainTomorrow[weather_df$RainTomorrow == 'No'] <- 0
+weather_df$RainTomorrow <- as.numeric(weather_df$RainTomorrow)
+head(weather_df)
+
+# 단계 3: 학습데이터와 검정데이터 생성(7:3 비율)
+idx <- sample(1:nrow(weather_df), nrow(weather_df) * 0.7)
+train <- weather_df[idx, ]
+test <- weather_df[-idx, ]
+
+# 단계 4: 로지스틱 회귀모델 생성
+weather_model <- glm(RainTomorrow ~ ., data = train, family = 'binomial')
+weather_model
+summary(weather_model)
 
 
+# 단계 5: 로지스틱 회귀모델 예측치 생성
+pred <- predict(weather_model, newdata = test, type = "response")
+pred
+is.na(pred)
+table(is.na(pred))
 
+round(pred)
+ifelse(pred>=0.5,1,0)
 
+#상관관계
+cor(round(pred),test$RainTomorrow)
+table(round(pred),test$RainTomorrow)
 
-
+install.packages("ROCR")
+library(ROCR)
+pr<-prediction(pred,test$RainTomorrow)
+prf<-performance(pr,measure = "tpr",x.measure = "fpr")
+plot(prf)
 
 
