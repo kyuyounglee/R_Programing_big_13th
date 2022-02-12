@@ -236,7 +236,56 @@ formula = Species ~ .
 model<-randomForest(formula,data=iris,ntree=300,
                     mtry=4, na.action = na.omit)
 
+str(model)
+
 model<-randomForest(formula,data=iris,importance=T,na.action = na.omit)
 importance(model)
+varImpPlot(model)
 
 
+#최적의 파라메터를찾기---> 파라메터튜닝, 하이퍼파라메터
+ntree<-c(400,500,600,700,800)
+mtry<-c(2:6)
+param<-data.frame(n=ntree,m=mtry) # 2차원 배열형태로 표현
+
+#for문을 이용해서 찾기
+for(i in param$n){
+  cat('ntree = ',i,'\n')
+  for(j in param$m){
+    cat('mtry = ',j,'\n')
+    model<-randomForest(formula,data=iris,ntree=i,mtry=j,na.action = na.omit)
+    print(model)
+  }
+}
+
+
+#xgboost  불량케이스..... 정상100만건... 불량데이터 100
+
+install.packages("xgboost")
+library(xgboost)  # 종속변수는 숫자로 되어야한다. 문자레이블
+# 레이블 인코딩  0 1 2
+one<- names(table(iris$Species))[1]
+two<-names(table(iris$Species))[2]
+three<-names(table(iris$Species))[3]
+
+data("iris")
+iris$label[iris$Species == one]<-0
+iris$label[iris$Species == two]<-1
+iris$label[iris$Species == three]<-2
+# train test
+idx<-sample(1:nrow(iris), nrow(iris)*0.7)
+train<-iris[idx,]
+test<-iris[-idx,]
+View(train)
+
+train_mat<- as.matrix( train[-c(5,6)] )
+train_lab<- train$label
+
+dtrain<- xgb.DMatrix(data=train_mat,label=train_lab)
+model_xgb<-xgboost(data = dtrain, nrounds=50)
+
+#test
+test_mat<- as.matrix(test[-c(5,6)])
+dim(test_mat)
+pred_iris<- predict(model_xgb,test_mat)
+round(sqrt(pred_iris))
