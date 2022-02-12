@@ -195,6 +195,48 @@ data_cleaning<-train_set %>%  group_by(Ages) %>%  summarise(Ages_count =  n() )
 data_cleaning %>% ggplot(aes(x=Ages,y=Ages_count, fill=Ages)) +
   geom_col()+
   geom_text(aes(label=(Ages_count)),vjust=1,hjust=0.5)
+
+data_cleaning<-train_set %>%  group_by(Ages,Survived) %>%  summarise(Ages_count =  n() )
+data_cleaning %>% ggplot(aes(x=Ages,y=Ages_count, fill=Survived)) +
+  geom_col()+
+  geom_text(aes(label=(Ages_count)))
   
-  
+
+
+# 성별에 따른 생존여부
+ggplot_data<- train_set %>% ggplot(aes(x=Survived,fill=Sex))+
+  geom_bar() + ggtitle("성별에따른 생존")+
+  theme_bw()
+#반응형 시각화
+ggplotly(ggplot_data,height = 500,width = 800)
+
+#나이따른 생존유무
+ggplot_data<-train_set %>% ggplot(aes(x=Survived,fill=Ages)) +
+  geom_bar()+ ggtitle("나이에따른 생존")+
+  theme_bw()
+#반응형 시각화
+ggplotly(ggplot_data,height = 400,width = 700)
+
+# 모델을 생성 rpart
+str(train_set)
+furmula = Survived ~ Pclass+Age
+ctree (furmula,data=train_set )
+#rpart_m<- rpart(furmula,data=train_set)
+#  의사결정나무 시각화
+#prp(rpart_m,type=4,digit=3)
+
+
+#랜덤 포레스트
+install.packages("randomForest")
+library(randomForest )
+data("iris")
+
+names(iris)
+formula = Species ~ .
+model<-randomForest(formula,data=iris,ntree=300,
+                    mtry=4, na.action = na.omit)
+
+model<-randomForest(formula,data=iris,importance=T,na.action = na.omit)
+importance(model)
+
 
