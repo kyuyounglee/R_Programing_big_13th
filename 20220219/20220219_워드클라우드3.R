@@ -14,6 +14,10 @@ makeWc = function(data,isFile = TRUE, hangle = TRUE){
   remotes::install_github('haven-jeon/KoNLP', upgrade = "never",
                           INSTALL_opts=c("--no-multiarch"))
   library(KoNLP)
+  
+  install.packages("wordcloud")
+  library(wordcloud)
+  
   if (isFile){
     marketing= file(data,encoding = "utf-8")   # 파일 열고
     marketing2 =  readLines(marketing)                    # 파일 읽고
@@ -64,9 +68,10 @@ makeWc = function(data,isFile = TRUE, hangle = TRUE){
   #색상
   pal= brewer.pal(12,"Paired")
   wordcloud(word.df$word, word.df$freq,
-            random.order = F,
-            colors = pal)
+            random.order = F
+            ,colors = pal
+            )
 }
 ##########################################################
 
-makeWc("sample.txt")
+makeWc(news_totla,isFile = FALSE)
