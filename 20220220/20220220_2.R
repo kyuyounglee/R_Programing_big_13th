@@ -120,4 +120,46 @@ sort.seoul.rain<-dlply(init.seoul.rain, .(date))
 head(sort.seoul.rain)
 
 # 일별로 데이터가 2개씩 중복 되어 있으므로 하나만 선택한다
+resort.seoul.rain<- lapply(1:length(sort.seoul.rain), function(x) sort.seoul.rain[[x]][1,])
+head(resort.seoul.rain)
 
+# 반복문을 이용해서 value date만 추출한후 data frame 변환
+seoul.rain<- data.frame(
+  rain =unlist(lapply(1:length(resort.seoul.rain),function(x) resort.seoul.rain[[x]][,3])),
+  date =unlist(lapply(1:length(resort.seoul.rain),function(x) resort.seoul.rain[[x]][,4]))
+)
+head(seoul.rain)
+# 결측치를 저리   0으로 
+seoul.rain[is.na(seoul.rain),][1]<-0
+head(seoul.rain)
+
+#농산물 데이터가 2011 ~ 2013
+# 기상데이터는 2010 ~ 2014
+
+seoul.item.rain<- merge(seoul.rain,seoul.item.mean, by="date", all=T)
+head(seoul.item.rain)
+seoul.item.rain<- na.omit(seoul.item.rain)
+head(seoul.item.rain)
+
+# 시각화
+# 2011 ~ 2013 서울의 강수량 변화에 따른 상추가격을 시각화 
+
+par(mar = c(3,5,3,5))  # 현재 그래픽장치의 그래픽 parameter의 텍스트 라인을 수정 순서는
+# bottom-left-top-right
+
+temp1<- seoul.item.rain %>% subset(seoul.item.rain$name=="호박")
+plot(as.Date(temp1$date), temp1$mean.price,
+     type="l",col="blue", xlab="",ylab="",ylim=c(0,4000))
+mtext("가격",size=2,line=3)
+
+par(new=TRUE)
+temp2<- seoul.item.rain %>% subset(seoul.item.rain$name=="상추")
+plot(as.Date(temp2$date), temp2$mean.price,
+     type="l",col="green", xlab="",ylab="",ylim=c(0,4000),axes=FALSE)
+
+par(new=TRUE)
+temp3<- seoul.item.rain %>% subset(seoul.item.rain$name=="상추")
+plot(as.Date(temp3$date), temp3$rain,
+     type="l",col="red", xlab="",ylab="",ylim=c(0,400),axes=FALSE)
+axis(4,ylim=c(0,400), col.axis = 'red',las=3)
+mtext("강수량",size=4,line=3)
