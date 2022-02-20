@@ -9,6 +9,7 @@
 library1 <- c('plyr','ggplot2','stringr','zoo','corrplot','RColorBrewer')
 unlist(lapply(library1,require, character.only=TRUE))
 install.packages("corrplot")
+library(corrplot)
 
 
 # plyr : 데이터 핸들링  
@@ -97,5 +98,151 @@ head(pig.region.yearly.mean)
 
 #### 시각화 ###########
 
+#1. 월별 돼지고기 가격
+pig.region.monthly.mean$month<- as.Date(as.yearmon(pig.region.monthly.mean$month, "%Y-%m"))
+# as.yearmon : factor타입의 데이터를 월별 시계열로 변환
+# as.Date : 변환된 시계열데이터를 date타입으로 변환
+colnames(pig.region.monthly.mean)
+ggplot(pig.region.monthly.mean, aes(x=month,y=mean.pirce,colour = name,group=name)) +
+  geom_line() +theme_bw() + geom_point(size=6,shape=20,alpha=0.5)+
+  ylab("돼지고기 가격") + xlab("")
 
+# 돼지고기의 연평균 가격
+ggplot(pig.region.yearly.mean, aes(x=year,y=mean.pirce,colour = name,group=name)) +
+  geom_line() +theme_bw() + geom_point(size=6,shape=20,alpha=0.5)+
+  ylab("돼지고기 가격") + xlab("")
+
+# 연평균 가격의 변화를 막대그래프로 
+ggplot(pig.region.yearly.mean, aes(x=name,y=mean.pirce,fill=factor(year))) +
+  theme_bw() + geom_bar(stat = "identity",position = 'dodge', colour = "white") +
+  ylab("돼지고기 가격") + xlab("")
+
+
+# boxplot
+ggplot(pig.region.monthly.mean, aes(x=name,y=mean.pirce,fill=name)) +
+  theme_bw() + geom_boxplot() +
+  ylab("돼지고기 가격") + xlab("")
+
+
+# 연도별 가격 분포
+ggplot(pig.region.yearly.mean, aes(x=name,y=mean.pirce,fill=name)) +
+  theme_bw() + geom_boxplot() + facet_wrap(~year, scales='fixed')+
+  ylab("돼지고기 가격") + xlab("") + theme(axis.text.x = element_text(size=9))
+
+# 한번에 가격변화를 비교하기 어려우므로..... 도시들간의 상관관계를 분석
+# 상관관계가 높은 도시들 묶어서 가격 변화를 보자
+
+temp<- dlply( pig.region.daily.mean, .(name), summarise, mean.pirce)
+head(temp)
+pig.region<- data.frame(서울 = unlist(temp$서울),
+             부산 = unlist(temp$부산),
+             대구 = unlist(temp$대구),
+             인천 = unlist(temp$인천),
+             광주 = unlist(temp$광주),
+             대전 = unlist(temp$대전),
+             울산 = unlist(temp$울산),
+             수원 = unlist(temp$수원),
+             청주 = unlist(temp$청주),
+             전주 = unlist(temp$전주),
+             제주 = unlist(temp$제주)
+             )
+cor_pig<- cor(pig.region)
+corrplot(cor_pig,method = "color" ,type="upper", order="hclust", addCoef.col = 'white',
+         tl.srt = 0,tl.col = 'black',tl.cex = 0.7,col=brewer.pal(n=8,name="PuOr"))
+
+str(pig.region.monthly.mean)
+
+
+# 서울 광주 대구
+ggplot(pig.region.monthly.mean[pig.region.monthly.mean$region %in% c(2401,2200,1101),], 
+       aes(x=month,y=mean.pirce, colour = name, group=name)) +
+  geom_line()+theme_classic()+geom_point(size=6,shape=20,alpha=0.5)+
+  ylab("돼지고기 가격") + xlab("")
+
+# 데이터 저장
+write.csv(pig.region, "pig.region.csv")
+write.csv(pig.region.monthly.mean, "pig.region.monthly.mean.csv")
+
+# 상관관계 and 공적분 검증  농산물 소매가격의 연관성
+head(product)
+head(category)
+
+# 품목 일자별로 평균 가격 
+temp<-ddply(product, .(item,date), summarise, mean.price = mean(price))
+head(temp)
+
+# merge temp 하고 category 를 item으로 묶어서 
+date.item.mean<- merge(temp,category,by='item')
+head(date.item.mean)
+
+#월별 데이터
+month.item.mean<-ddply(date.item.mean, 
+                       .(name,item,month = str_sub(as.character.Date(date),1,7))
+                       , summarise, mean.price=mean(mean.price)
+                       )
+head(month.item.mean)
+
+# 공적분 검증을 위해 데이터를 만들
+temp<-dlply(date.item.mean, .(name), summarise, mean.price)
+names(temp)
+daily.product<- data.frame(
+  닭고기 = unlist(temp$닭고기),돼지고기 = unlist(temp$돼지고기),
+  배추 = unlist(temp$배추),사과 = unlist(temp$사과),
+  상추 = unlist(temp$상추),쌀 = unlist(temp$쌀),
+  양파 = unlist(temp$양파),참깨  = unlist(temp$참깨 ),
+  파프리카 = unlist(temp$파프리카),호박 = unlist(temp$호박)
+)
+head(daily.product)
+
+# 월간 품목별 평균
+temp<-dlply(month.item.mean, .(name), summarise, mean.price)
+names(temp)
+monthly.product<- data.frame(
+  닭고기 = unlist(temp$닭고기),돼지고기 = unlist(temp$돼지고기),
+  배추 = unlist(temp$배추),사과 = unlist(temp$사과),
+  상추 = unlist(temp$상추),쌀 = unlist(temp$쌀),
+  양파 = unlist(temp$양파),참깨  = unlist(temp$참깨 ),
+  파프리카 = unlist(temp$파프리카),호박 = unlist(temp$호박)
+)
+head(monthly.product)
+
+#돼지고기와 다른 품목들간의 공적분 관계가 있는지 검정정
+install.packages("urca")
+library(urca)
+
+#공적분의 예
+for (i in 1:9){
+  for (j in 1:9){
+    if ((i+j) < 11){
+      jc <- ca.jo(data.frame(daily.product[,i], daily.product[,i+j]), type="trace", K=2, ecdet="const")
+      if (jc@teststat[1] > jc@cval[1]) {
+        if(jc@V[1,1]*jc@V[2,1]>0){
+          cat( colnames(monthly.product)[i],"와" , colnames(monthly.product)
+               [i+j], ": 음의 공적분 관계가 있다.", "\n")
+        } else {
+          cat( colnames(monthly.product)[i],"와" , colnames(monthly.product)
+               [i+j], ": 양의 공적분 관계가 있다.","\n")
+        }
+      }
+    }
+  }
+}
+# ca.jo() : 두 변수갂의 요핚슨 공적분 검정을 시행함
+
+#공적분 검정을 더 알아보기 위해 아래 상추와 호박의 공적붂 붂석 결과를 살펴보자.
+output <- ca.jo(data.frame(daily.product[,3], daily.product[,4]),
+                type="trace", K=2, ecdet="const")
+summary(output)
+# 위 결과에서 필요한 붂석 결과를 추춗하면 아래와 같다.
+output@teststat[1]
+output@cval[1]
+output@V[1,1]
+output@V[2,1]
+# 해설
+#output@teststat 그리고 output@cval:
+#  – r<=1 이라는 귀무가설 하에서 10% 유의수준으로 teststat(8.14) >
+#  cval(10pct)(7.52)이면 공적붂 관계가 있다고 본다.
+#• output@V :
+#  – [1,1]의 값 1.00000 과 [2,1]의 값 -1.05189 의 곱이 음수이므로 양의 공적붂
+#관계가 있다고 본다.
 
