@@ -58,3 +58,26 @@ ggplot(month.item.mean.01,aes(x=month,y=mean.price,colour=name,group=name) )+
 # 돼지고기 자료에 대한 군집 분석
 head(pig.region)
 plot(hclust(diss(pig.region,'COR')),axes = F, ann =F)
+
+pig.region.monthly.mean$month <- as.Date(as.yearmon(pig.region.monthly.mean$month,'%Y-%m'))
+
+# 대구,광주  부산,울산
+code[code$분류코드설명 %in% c("대구","광주"),]
+temp<-subset(pig.region.monthly.mean, pig.region.monthly.mean$region %in% c(2200,2401))
+ggplot(temp,aes(x=month,y=mean.pirce,colour=name,group=name) )+
+  geom_line()+ylab("가격") + xlab("")
+
+code[code$분류코드설명 %in% c("부산","울산"),]
+temp<-subset(pig.region.monthly.mean, pig.region.monthly.mean$region %in% c(2100,2601))
+ggplot(temp,aes(x=month,y=mean.pirce,colour=name,group=name) )+
+  geom_line()+ylab("가격") + xlab("")
+
+code[code$분류코드설명 %in% c("대구","부산"),]
+temp<-subset(pig.region.monthly.mean, pig.region.monthly.mean$region %in% c(2100,2200))
+ggplot(temp,aes(x=month,y=mean.pirce,colour=name,group=name) )+
+  geom_line()+ylab("가격") + xlab("")
+
+
+# http://news.kmib.co.kr/article/view.asp?arcid=0004564454&code=11151100
+# http://blog.daum.net/sun6377/5061880
+# http://blog.naver.com/PostView.nhn?blogId=giant50&logNo=140143825979
