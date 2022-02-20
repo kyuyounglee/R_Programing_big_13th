@@ -80,4 +80,44 @@ ggplot(temp,aes(x=month,y=mean.pirce,colour=name,group=name) )+
 
 # http://news.kmib.co.kr/article/view.asp?arcid=0004564454&code=11151100
 # http://blog.daum.net/sun6377/5061880
-# http://blog.naver.com/PostView.nhn?blogId=giant50&logNo=140143825979
+
+
+weather<-read.csv('weather.csv',header = T)
+weather<- read.csv("https://raw.githubusercontent.com/kyuyounglee/R_Programing_big_13th/main/data/weather.csv"
+                   , header = T
+                   )
+head(weather)
+
+subset(code, 구분코드설명 == '지역코드')
+category<- subset(code, 구분코드설명 == '품목코드')
+colnames(category) = c('code','exp','item','name')
+
+# 서울지역(1101)의 가격만 추출  품목,일자별로 평균 가격구하고
+# 품목에대한 데이터인 category와 merge 해서 새로운 데이터 생성
+
+seoul.item<- ddply(subset(product,product$region == 1101), .(item,date), summarise, 
+      mean.price = mean(price) ) %>% merge(category, by="item", all=T)
+head(seoul.item)
+seoul.item.mean<- seoul.item[,-c(4,5)]
+
+# 기상 데이터 가공
+str(weather)
+colnames(weather)<-c('region','category','value','date')
+head(weather)
+region.weather<- dlply(weather, .(region))
+names(region.weather)
+head(region.weather[[41]])
+table(region.weather[[41]]$category)
+
+# 분석대상 서울의 강수량
+init.seoul.rain<-region.weather[[41]] %>% 
+  subset(region.weather[[41]]$category == '강수량')
+
+head(init.seoul.rain)
+table(init.seoul.rain$date)
+# 날짜순으로 정렬
+sort.seoul.rain<-dlply(init.seoul.rain, .(date))
+head(sort.seoul.rain)
+
+# 일별로 데이터가 2개씩 중복 되어 있으므로 하나만 선택한다
+
