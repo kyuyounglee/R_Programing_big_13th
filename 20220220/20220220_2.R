@@ -45,3 +45,16 @@ plot(hclust(diss(farm.product,'COR')),axes = F, ann =F)
 # axes = F 모든축을 출력하지 않도록
 # ann =F 모든 축에 대한 설명을 출력하지 않도록
 
+
+# 상추 호박의 시계열 시각화
+str(month.item.mean)
+month.item.mean$month <- as.Date( as.yearmon(month.item.mean$month, '%Y-%m') )
+
+month.item.mean.01<- subset(month.item.mean, month.item.mean$name %in% c("상추","호박"))
+
+ggplot(month.item.mean.01,aes(x=month,y=mean.price,colour=name,group=name) )+
+  geom_line()+ylab("가격") + xlab("")
+
+# 돼지고기 자료에 대한 군집 분석
+head(pig.region)
+plot(hclust(diss(pig.region,'COR')),axes = F, ann =F)
