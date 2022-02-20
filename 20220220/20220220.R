@@ -71,4 +71,31 @@ for(i in 1: length(total.pig.mean)){
 
 # 전처리..... 길이가 맞지 않는 지역을 제거
 removeCol
+day.pig<- day.pig[! day.pig$name %in% removeCol,]
+table(day.pig$name)
+
+# day.pig 지역,일자별로 평균가격을 구해
+pig.region.daily.mean<- ddply(day.pig, .(name,region,date), summarise, mean.pirce = mean(price))
+head(pig.region.daily.mean)
+
+# date에서 month만 추출 지역. 월별 돼지고기 평균
+str_sub( pig.region.daily.mean$date, 1,7)
+
+pig.region.monthly.mean<- ddply(pig.region.daily.mean,
+      .(name,region, month = str_sub( pig.region.daily.mean$date, 1,7)),
+      summarise, mean.pirce = mean(mean.pirce)
+      )
+head(pig.region.daily.mean)
+head(pig.region.monthly.mean)
+
+pig.region.yearly.mean<-ddply(pig.region.daily.mean,
+  .(name,region, year = str_sub( pig.region.daily.mean$date, 1,4)),
+  summarise, mean.pirce = mean(mean.pirce)
+)
+head(pig.region.yearly.mean)
+############################# 데이터 가공 끝 ##################
+
+#### 시각화 ###########
+
+
 
